@@ -1,17 +1,17 @@
-# Claude Code Graphite
+# Graphite Skill
 
 Claude Code plugins for [Graphite](https://graphite.dev) stacked PRs workflow.
 
 ## Installation
 
 ```bash
-claude plugin marketplace add georgeguimaraes/claude-code-graphite
+claude plugin marketplace add bnorquist/graphite-skill
 ```
 
 Install all plugins:
 
 ```bash
-claude plugin install graphite@claude-code-graphite
+claude plugin install graphite@graphite-skill
 ```
 
 ## Prerequisites
