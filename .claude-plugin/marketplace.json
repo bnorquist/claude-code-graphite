@@ -13,11 +13,6 @@
       "name": "graphite",
       "source": "./plugins/graphite",
       "description": "Skill and hooks for Graphite CLI stacked PRs: gt commands, stack planning, conflict resolution"
-    },
-    {
-      "name": "graphite-mcp",
-      "source": "./plugins/graphite-mcp",
-      "description": "MCP server integration for Graphite CLI (gt mcp)"
     }
   ]
 }
