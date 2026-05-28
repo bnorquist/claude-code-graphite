@@ -51,27 +51,32 @@ Use these `gt` commands instead of their git equivalents:
 
 | Instead of           | Use                          | Purpose                                 |
 | -------------------- | ---------------------------- | --------------------------------------- |
-| `git commit`         | `gt create -am "msg"`        | Create new branch/PR with changes       |
-| `git commit --amend` | `gt modify -a`               | Amend current PR                        |
+| `git commit` (new branch) | `gt create -m "msg"`    | Create new branch/PR with staged changes |
+| `git commit` (same branch) | `gt modify -c -m "msg"` | Add a new commit to the current branch (default for follow-up work) |
+| `git commit --amend` | `gt modify` (opt-in)         | Amend the current branch's tip commit — only when explicitly requested or squashing trivial fixups pre-review |
 | `git push`           | `gt submit --no-interactive` | Submit current + all downstack branches |
 | `git pull`           | `gt sync`                    | Pull trunk, restack, clean merged       |
 | `git checkout`       | `gt checkout <branch>`       | Switch branches                         |
 | `git rebase`         | `gt restack`                 | Rebase stack (usually via `gt sync`)    |
 
+**Never pass `-a` / `-am` to `gt create` or `gt modify`** — it sweeps untracked files into the commit. Always `git add <paths>` explicitly first, then run the `gt` command without `-a`.
 
-## When to Create vs Amend
 
-**Use `gt create -am "message"`** when:
+## When to Create, Add a Commit, or Amend
+
+**Default: add a new commit to the current branch** with `gt modify -c -m "msg"`. Stage explicitly with `git add <paths>` first so untracked files aren't swept in. This is the right call for almost all follow-up work, including review feedback — it keeps the review trail legible and avoids force-pushes when reviewers are mid-read.
+
+**Use `gt create -m "message"`** (after `git add <paths>`) when:
 
 - Starting new work (new feature, new fix)
-- The change is logically separate from current PR
+- The change is logically separate from the current PR
 - Building the next piece in a stack
 
-**Use `gt modify -a`** when:
+**Use `gt modify` to amend** only when:
 
-- Addressing PR review feedback
-- Fixing something in the current PR
-- Adding forgotten changes to current work
+- The user explicitly asks to amend
+- Squashing a trivial fixup (typo, lint) into the tip commit *before* the PR has been reviewed
+- Never amend a commit that reviewers have already started reading
 
 ## Stack Philosophy
 
@@ -197,11 +202,14 @@ See `references/cheatsheet.md` for a complete command reference.
 
 ```bash
 gt sync                                    # Get latest
-gt create -am "feat: Add avatar upload API"
+git add <paths>                            # Stage explicitly — don't sweep untracked files
+gt create -m "feat: Add avatar upload API"
 # ... verify it passes CI ...
-gt create -am "feat: Add avatar display component"
+git add <paths>
+gt create -m "feat: Add avatar display component"
 # ... verify it passes CI ...
-gt create -am "feat: Add avatar to user profile"
+git add <paths>
+gt create -m "feat: Add avatar to user profile"
 gt submit --no-interactive                 # Submit entire stack
 ```
 
@@ -210,7 +218,8 @@ gt submit --no-interactive                 # Submit entire stack
 ```bash
 gt checkout <branch-with-feedback>
 # ... make fixes ...
-gt modify -a                               # Amend changes
+git add <paths>                            # Stage explicitly — don't sweep untracked files
+gt modify -c -m "review: address feedback" # Add a new commit (preserves review trail)
 gt submit --no-interactive                 # Push updates (auto-restacks dependents)
 ```
 
